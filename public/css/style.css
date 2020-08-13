@@ -1,0 +1,142 @@
+body{
+    background-color: #fff;
+    color: #555555;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.6em;
+    margin: 0;
+}
+.image{
+    width: 100%;
+    text-align: center;
+    display: block;
+}
+
+.container{
+    width: 80%;
+    margin: auto;
+}
+
+.display{
+    float:middle;
+    text-align: center;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 15px;
+    width: 50%; 
+    margin: auto;
+    margin-bottom: 40px;
+}
+
+.display h6{
+    font-size: large;
+    margin-bottom: 10px;
+}
+
+.display h2{
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.my-form input[type="text"], input[type="number"], input[type="email"]{
+    padding: 8px;
+    width: 40%
+}
+
+.button {
+    background-color: #00b383;
+    color: #f4f4f4;
+    padding: 8px;
+    box-sizing: border-box;
+    width: 30%; 
+    margin: auto; 
+    margin-top: 2em;
+    border-radius: 15px;
+    font-weight: bold;
+    border: none;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+}
+
+
+/*
+.fix-me{
+    position: fixed;
+    top: 400px;
+    margin :auto;
+    width: 20%;
+}
+*/
+
+#location{
+    font-weight: bold;
+    font-size: 30px;
+    color: #555555;
+}
+
+
+#main-header{
+    background-color: lightgray;
+    color: #555555;
+    text-align: center;   
+}
+
+#logo{
+    width: 60%;
+    height: 60%;
+}
+
+
+
+@media all and (min-width: 1024px) {
+    .display{
+        width: 40%; 
+    }
+    .my-form input[type="text"], input[type="number"], input[type="email"]{
+        padding: 8px;
+        width: 60%
+    }
+    .button{
+        width: 20%; 
+    }
+}
+
+@media all and (min-width: 768px) and (max-width: 1024px) { 
+    .display{
+        width: 40%; 
+    }
+    .my-form input[type="text"], input[type="number"], input[type="email"]{
+        width: 70%
+    }
+    .button{
+        width: 25%; 
+    }
+ }
+
+@media all and (min-width: 480px) and (max-width: 768px) { 
+    .display{
+        width: 60%; 
+    }
+    .my-form input[type="text"], input[type="number"], input[type="email"]{
+        width: 70%
+    }
+    .button{
+        width: 35%; 
+    }
+}
+
+@media all and (max-width: 480px) {
+    .display{
+        width: 80%; 
+    }
+    .my-form input[type="text"], input[type="number"], input[type="email"]{
+        width: 70%
+    }
+    .button{
+        width: 40%; 
+    }
+
+ }

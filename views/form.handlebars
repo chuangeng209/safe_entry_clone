@@ -1,0 +1,25 @@
+<div class = "container">
+    <nav>
+        <a href="{{back}}">
+            Back
+        </a>
+    </nav>
+    <div class="image">
+        <img src="./images/fakeEntry.png" alt="" id="logo">
+    </div>
+    <div class="display">
+        
+        <form action="{{api}}" method="POST" class="my-form">
+            <strong>{{name}}</strong>
+            <div class="form-group">
+                <p><label for="ic">NRIC/FIN</label></p>
+                <input type="text" name="ic" class="ic">
+            </div>
+            <div class="form-group">
+                <p><label for="number">Mobile Number</label></p>
+                <input type="number" name="number" class="number">
+            </div>
+            <input class="button" type="submit" value="Check-In" name="">
+        </form>
+    </div>
+</div>

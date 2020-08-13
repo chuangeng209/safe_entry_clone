@@ -1,2 +1,3 @@
 # safe_entry_clone
-Vanilla js, with express and mongo db (Just for fun) 
+MEN stack --> Playing around Vanilla js, with express and mongo db (For fun) 
+In progress 
