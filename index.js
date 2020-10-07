@@ -5,8 +5,9 @@ const exphbs = require('express-handlebars')
 const fetch = require('node-fetch');
 const app = express()
 const QRCode = require('qrcode')
+const logger = require('./middleware/logger')
 
-
+app.use(logger)
 
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -30,11 +31,15 @@ let form_api = new URL(template + '/api/posts');
 let form_url = new URL(template + '/form'); 
 let home_url = new URL (template);
 
+
+//register biz for fake entry to visitors
 app.get('/registration', (req,res) => res.render('register'));
 
+
+////Link to qr code 
 app.get('/link/:id', (req,res) => {
-    let urlId = url+'/' +req.params.id
-    let homeId = home_url + req.params.id
+    let urlId = url+'/' +req.params.id;
+    let homeId = home_url + req.params.id;
     api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
@@ -50,6 +55,9 @@ app.get('/link/:id', (req,res) => {
     }
 });
 
+
+
+// landing page - entry of the location  
 app.get('/:id', (req,res) => {
     let urlId = url+'/'+req.params.id;
     let formId = form_url + '/' +req.params.id;
@@ -64,22 +72,24 @@ app.get('/:id', (req,res) => {
     }
 });
 
+// Form page - entry of the location
 app.get('/form/:id', (req,res) => {
     let urlId = url+'/'+req.params.id
     let backId = home_url + req.params.id
+    console.log(typeof req.params.id)
     api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
             res.render('form', {
                 name: data[0].name,
                 back: backId,
-                api: form_api + '/' + req.params.id 
+                api: form_api + '/' + req.params.id // 'http://127.0.0.1:5000/api/posts/sadsadsa
             })
         }).catch((error) => console.log(error));
     }
 });
 
-
+//After succesfull check in -- show status 
 app.get('/success/:id', (req,res) => { // check in 
     api(form_api)
     function api(input) {
@@ -95,12 +105,16 @@ app.get('/success/:id', (req,res) => { // check in
     }
 });
 
+
+
+// need to check if user checkout object vairable or not , if not redirect him / her to the checkout form  
+//page view once user checkout  
 app.get('/complete/:id', (req,res) => { //check out 
-    api(form_api)
+    api(form_api+ '/' + req.params.id)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
             console.log(data[0])
-            res.render('success', {
+            res.render('checkout', {
                 name: data[0].place_id,
                 date: data[0].date,
                 status: data[0].status, 
@@ -110,6 +124,7 @@ app.get('/complete/:id', (req,res) => { //check out
 });
 
 
+//create api route 
 const posts = require('./routes/api/posts');
 const register = require('./routes/api/register');
 app.use('/api/posts', posts);
