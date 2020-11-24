@@ -8,7 +8,6 @@ const QRCode = require('qrcode')
 const logger = require('./middleware/logger')
 
 app.use(logger)
-
 app.use(express.static(path.join(__dirname, 'public')))
 
 //to handle json data 
@@ -29,20 +28,23 @@ template = 'http://127.0.0.1:5000'
 let url = new URL(template + '/api/register');
 let form_api = new URL(template + '/api/posts'); 
 let form_url = new URL(template + '/form'); 
+let checkout_url = new URL(template + '/checkout'); 
 let home_url = new URL (template);
+
 
 
 //register biz for fake entry to visitors
 app.get('/registration', (req,res) => res.render('register'));
 
 
-////Link to qr code 
+////Link to qr code - register collection 
 app.get('/link/:id', (req,res) => {
     let urlId = url+'/' +req.params.id;
     let homeId = home_url + req.params.id;
     api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
+            //console.log(data[0].name)
             QRCode.toDataURL(homeId, function (err, url) {
                 res.render('link', {
                     name: data[0].name,
@@ -57,22 +59,24 @@ app.get('/link/:id', (req,res) => {
 
 
 
-// landing page - entry of the location  
+// landing page - entry of the location  , have check in or checkout options 
 app.get('/:id', (req,res) => {
     let urlId = url+'/'+req.params.id;
     let formId = form_url + '/' +req.params.id;
+    let checkoutId = checkout_url + '/' +req.params.id
     api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
             res.render('index', {
                 name: data[0].name,
-                qrcodelink: formId
+                qrcodelink: formId,
+                checkoutlink: checkoutId
             })
         }).catch((error) => console.log(error));
     }
 });
 
-// Form page - entry of the location
+// Form page - checkin - entry of the location
 app.get('/form/:id', (req,res) => {
     let urlId = url+'/'+req.params.id
     let backId = home_url + req.params.id
@@ -83,24 +87,58 @@ app.get('/form/:id', (req,res) => {
             res.render('form', {
                 name: data[0].name,
                 back: backId,
-                api: form_api + '/' + req.params.id // 'http://127.0.0.1:5000/api/posts/sadsadsa
+                api: form_api + '/' + req.params.id, // 'http://127.0.0.1:5000/api/posts/sadsadsa
+                checktype: 'Check In'
             })
         }).catch((error) => console.log(error));
     }
 });
 
-//After succesfull check in -- show status 
-app.get('/success/:id', (req,res) => { // check in 
-    api(form_api)
+
+// CHeck out form - if user need to type to check out 
+app.get('/checkout/:id', (req,res) => {
+    let urlId = url+'/'+ req.params.id
+    let backId = home_url + req.params.id
+    //console.log(typeof req.params.id)
+    api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
-            console.log(data[0])
-            res.render('success', {
-                name: data[0].place_id,
-                date: data[0].date,
-                status: data[0].status,
-                api: form_api + '/out/' + req.params.id 
+            res.render('form', {
+                name: data[0].name,
+                back: backId,
+                api: form_api + '/checkout/' + req.params.id, // 'http://127.0.0.1:5000/api/posts/checkout/sadsadsa
+                checktype: 'Check Out'
             })
+        }).catch((error) => console.log(error));
+    }
+});
+
+
+
+//After succesfull check in -- show status 
+app.get('/success/:id', (req,res) => { // check in 
+    status_link = form_api + '/' + req.params.id
+    api(status_link)
+    function api(input) {
+        return fetch(input).then(res => res.json()).then(data => {
+            console.log('return' , data[0])
+            if (data[0].status == 'Check-in') {
+                res.render('success', {
+                    name: data[0].place_id,
+                    date: data[0].date,
+                    status: data[0].status,
+                    api: form_api + '/out/' + req.params.id, 
+                    checkOut: true
+                })
+            } else {
+                res.render('success', {
+                    name: data[0].place_id,
+                    date: data[0].date,
+                    status: data[0].status,
+                    api: form_api + '/out/' + req.params.id, 
+                    checkOut: false
+                })
+            }
         }).catch((error) => console.log(error));
     }
 });
@@ -113,7 +151,7 @@ app.get('/complete/:id', (req,res) => { //check out
     api(form_api+ '/' + req.params.id)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
-            console.log(data[0])
+            //console.log(data[0])
             res.render('checkout', {
                 name: data[0].place_id,
                 date: data[0].date,

@@ -15,6 +15,8 @@
             <div>{{name}}</div> 
         </div>
         <form action="{{api}}" method="POST" class="my-form">
+            {{#if checkOut}}
             <input class="button" type="submit" value="Check-Out" name="">
+            {{/if}}
         </form>
 </div>

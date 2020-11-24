@@ -1,6 +1,6 @@
 const express = require('express');
 const mongodb = require('mongodb');
-const ObjectId = require('mongodb').ObjectId;
+const ObjectId = require('mongodb').ObjectID;
 const router = express.Router();
 const dbConnection = require('./config');
 
@@ -29,6 +29,8 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
 	try {
 		await loadPostsCollection((dbCollection) => {
+			//console.log(typeof req.params.id)
+			//console.log(req.params.id)
 			dbCollection.find({"_id": ObjectId(req.params.id)}).toArray((err,result) => {
 				res.send(result)
 			})

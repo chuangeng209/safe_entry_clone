@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
 	});
 
 
-//Add Post 
+//Add Post - check in 
 router.post('/:id', async (req, res) => {
 	const visitor = { 
 		ic: req.body.ic,
@@ -42,6 +42,37 @@ router.post('/:id', async (req, res) => {
 		try { 
 			await loadPostsCollection((dbCollection) => {
 				dbCollection.insertOne(visitor);
+				console.log('post test', visitor)
+				//console.log('test visitor id', visitor._id)
+				res.status(200);
+				res.redirect('http://127.0.0.1:5000/success/' + ObjectId(visitor._id).valueOf());
+			});
+			// res.status(201).send();
+		 } catch (error) {
+			 console.log(error);
+		 }
+	}
+  });
+
+
+// KIV
+//Add Post for checkout - manually key in 
+router.post('/checkout/:id', async (req, res) => {
+	const visitor = { 
+		ic: req.body.ic,
+		number: req.body.number,
+		date: sgTime('+8'),
+		status: 'Check-out',
+		place_id: req.params.id 
+	}
+	if (!visitor.ic || !visitor.number) {
+		return res.status(400).json({msg: 'Please include a name and email'})
+	} 
+	else {
+		try { 
+			await loadPostsCollection((dbCollection) => {
+				dbCollection.insertOne(visitor);
+				console.log(visitor)
 				res.status(200);
 				res.redirect('http://127.0.0.1:5000/success/' + ObjectId(visitor._id).valueOf());
 			});
@@ -67,8 +98,8 @@ router.get('/:id', async (req, res) => {
 )
 
 
-
-router.post('/out/:id', async (req, res) => { //check out 
+// when user use the check in already link 
+router.post('/out/:id', async (req, res) => { //check out using the link  
 	try {
 		await loadPostsCollection((dbCollection) => {
 			dbCollection.find({"_id": ObjectId(req.params.id)}).toArray((err,result) => {
