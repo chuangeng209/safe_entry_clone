@@ -29,7 +29,7 @@ app.set('view engine', 'handlebars');
 //////////////////////////////Display web page/////////////////////////////////////////////
 //sequence impt 
 
-template = 'http://localhost:' + process.env.PORT || 'http://localhost:5000' // only this will change 
+template = 'https://fakeentry.herokuapp.com' || 'http://localhost:' + process.env.PORT // || 'http://localhost:5000' only this will change 
 
 let url = new URL(template + '/api/register');
 let form_api = new URL(template + '/api/posts'); 

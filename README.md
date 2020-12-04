@@ -1,3 +1,7 @@
 # safe_entry_clone
-MEN stack --> Playing around Vanilla js, with express and mongo db (For fun) 
+MEN stack --> Vanilla js, with express and mongo db 
 In progress 
+
+
+Links: 
+Registration of buisness / entity: https://fakeentry.herokuapp.com/registration
