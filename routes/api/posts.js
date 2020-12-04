@@ -1,8 +1,10 @@
 const express = require('express');
 const mongodb = require('mongodb');
 const router = express.Router();
-const dbConnection = require('./config');
 const ObjectId = require('mongodb').ObjectId;
+
+require('dotenv').config()
+const dbConnection = process.env.DB_CONNECTION
 
 
 function sgTime(offset){
@@ -33,7 +35,8 @@ router.post('/:id', async (req, res) => {
 		number: req.body.number,
 		date: sgTime('+8'),
 		status: 'Check-in',
-		place_id: req.params.id 
+		place_id: req.params.id,
+		place_name: req.body.name
 	}
 	if (!visitor.ic || !visitor.number) {
 		return res.status(400).json({msg: 'Please include a name and email'})
@@ -45,7 +48,7 @@ router.post('/:id', async (req, res) => {
 				console.log('post test', visitor)
 				//console.log('test visitor id', visitor._id)
 				res.status(200);
-				res.redirect('http://127.0.0.1:5000/success/' + ObjectId(visitor._id).valueOf());
+				res.redirect('/success/' + ObjectId(visitor._id).valueOf());
 			});
 			// res.status(201).send();
 		 } catch (error) {
@@ -63,7 +66,7 @@ router.post('/checkout/:id', async (req, res) => {
 		number: req.body.number,
 		date: sgTime('+8'),
 		status: 'Check-out',
-		place_id: req.params.id 
+		place_id: req.body.name 
 	}
 	if (!visitor.ic || !visitor.number) {
 		return res.status(400).json({msg: 'Please include a name and email'})
@@ -74,7 +77,7 @@ router.post('/checkout/:id', async (req, res) => {
 				dbCollection.insertOne(visitor);
 				console.log(visitor)
 				res.status(200);
-				res.redirect('http://127.0.0.1:5000/success/' + ObjectId(visitor._id).valueOf());
+				res.redirect('/success/' + ObjectId(visitor._id).valueOf());
 			});
 			// res.status(201).send();
 		 } catch (error) {
@@ -110,14 +113,15 @@ router.post('/out/:id', async (req, res) => { //check out using the link
 					date: sgTime('+8'),
 					status: 'Check-out',
 					check_in_user_id: result[0]._id,
-					place_id: result[0].place_id 
+					place_id: result[0].place_id, 
+					place_name: result[0].place_name
 				}
 				try { 
 					 	loadPostsCollection((dbCollection) => {
 					        dbCollection.insertOne(outgoing);
 							res.status(200);
 							//res.send("ok");
-					        res.redirect('http://127.0.0.1:5000/complete/' + ObjectId(outgoing._id).valueOf());
+					        res.redirect('/complete/' + ObjectId(outgoing._id).valueOf());
 					    }
 					    );
 					    // res.status(201).send();

@@ -7,6 +7,11 @@ const app = express()
 const QRCode = require('qrcode')
 const logger = require('./middleware/logger')
 
+
+require('dotenv').config()
+
+
+
 app.use(logger)
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -24,7 +29,8 @@ app.set('view engine', 'handlebars');
 //////////////////////////////Display web page/////////////////////////////////////////////
 //sequence impt 
 
-template = 'http://127.0.0.1:5000'
+template = 'http://localhost:' + process.env.PORT || 'http://localhost:5000' // only this will change 
+
 let url = new URL(template + '/api/register');
 let form_api = new URL(template + '/api/posts'); 
 let form_url = new URL(template + '/form'); 
@@ -67,6 +73,7 @@ app.get('/:id', (req,res) => {
     api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
+            console.log(data)
             res.render('index', {
                 name: data[0].name,
                 qrcodelink: formId,
@@ -80,7 +87,7 @@ app.get('/:id', (req,res) => {
 app.get('/form/:id', (req,res) => {
     let urlId = url+'/'+req.params.id
     let backId = home_url + req.params.id
-    console.log(typeof req.params.id)
+    //console.log(typeof req.params.id)
     api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
@@ -124,7 +131,7 @@ app.get('/success/:id', (req,res) => { // check in
             console.log('return' , data[0])
             if (data[0].status == 'Check-in') {
                 res.render('success', {
-                    name: data[0].place_id,
+                    name: data[0].place_name,
                     date: data[0].date,
                     status: data[0].status,
                     api: form_api + '/out/' + req.params.id, 
@@ -132,7 +139,7 @@ app.get('/success/:id', (req,res) => { // check in
                 })
             } else {
                 res.render('success', {
-                    name: data[0].place_id,
+                    name: data[0].place_name,
                     date: data[0].date,
                     status: data[0].status,
                     api: form_api + '/out/' + req.params.id, 
@@ -151,9 +158,9 @@ app.get('/complete/:id', (req,res) => { //check out
     api(form_api+ '/' + req.params.id)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
-            //console.log(data[0])
+            console.log(data[0])
             res.render('checkout', {
-                name: data[0].place_id,
+                name: data[0].place_name,
                 date: data[0].date,
                 status: data[0].status, 
             })

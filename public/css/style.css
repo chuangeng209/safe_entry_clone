@@ -1,16 +1,45 @@
 body{
     background-color: #fff;
-    color: #555555;
+    color: black;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
     line-height: 1.6em;
     margin: 0;
 }
-.image{
-    width: 100%;
-    text-align: center;
-    display: block;
+
+
+.place-name{
+    font-size: 14px;
+    font-family: Poppins;
+    font-weight: 500;
+    line-height: 40px!important;
+    text-size-adjust: 100%;
+    color: black;
 }
+
+.check-in{
+    color: Green;
+    font-size: 32px;
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+}
+
+
+.resize{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+    height: auto;
+}
+
+.image{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    height: auto;
+}
+
 
 .container{
     width: 80%;

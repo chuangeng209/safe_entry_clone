@@ -4,13 +4,15 @@
             Back
         </a>
     </nav>
-    <div class="image">
-        <img src="./images/fakeEntry.png" alt="" id="logo">
+
+    <div class="resize">    
+        <img src="/images/fakeEntry.png" alt="" id="logo" class="image">
     </div>
     <div class="display">
         
         <form action="{{api}}" method="POST" class="my-form">
             <strong>{{name}}</strong>
+            <input type="hidden" id="name" name="name" value={{name}}>
             <div class="form-group">
                 <p><label for="ic">NRIC/FIN</label></p>
                 <input type="text" name="ic" class="ic">

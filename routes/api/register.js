@@ -2,10 +2,10 @@ const express = require('express');
 const mongodb = require('mongodb');
 const ObjectId = require('mongodb').ObjectID;
 const router = express.Router();
-const dbConnection = require('./config');
+require('dotenv').config()
+const dbConnection = process.env.DB_CONNECTION
 
 
-let link = 'http://127.0.0.1:5000/link/';
 
 function sgTime(offset){
 	const date = new Date();
@@ -62,7 +62,7 @@ router.post('/', async (req, res) => {
 				//console.log(biz.id);
 				let Obj = ObjectId(biz._id).valueOf();
 				console.log(typeof Obj);
-				res.redirect('http://127.0.0.1:5000/link/' + Obj);
+				res.redirect('/link/' + Obj);
 				//res.redirect(301, 'http://127.0.0.1:5000/link/' + ObjectId(biz._id));
 
 				//res.send('registration ok');
