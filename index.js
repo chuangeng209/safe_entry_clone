@@ -6,12 +6,12 @@ const fetch = require('node-fetch');
 const app = express()
 const QRCode = require('qrcode')
 const logger = require('./middleware/logger')
-
+const helmet = require('helmet')
 
 require('dotenv').config()
 
 
-
+app.use(helmet())
 app.use(logger)
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -29,7 +29,7 @@ app.set('view engine', 'handlebars');
 //////////////////////////////Display web page/////////////////////////////////////////////
 //sequence impt 
 
-template = 'https://fakeentry.herokuapp.com' || 'http://localhost:' + process.env.PORT // || 'http://localhost:5000' only this will change 
+template =  process.env.HOST_LINK || 'http://localhost:' + process.env.PORT //||// || 'http://localhost:5000' only this will change 
 
 let url = new URL(template + '/api/register');
 let form_api = new URL(template + '/api/posts'); 
@@ -178,4 +178,6 @@ app.use('/api/register', register);
 
 const PORT = process.env.PORT || 5000; //look for port in environment (deploy) || in dev in 5000 
 app.listen(PORT, () => console.log(`server started on ${PORT}`));
+
+
 

@@ -8,6 +8,11 @@ body{
 }
 
 
+.error{
+    line-height: 40px!important;
+    color: red;
+}
+
 .place-name{
     font-size: 14px;
     font-family: Poppins;

@@ -22,6 +22,9 @@
                 <input type="number" name="number" class="number">
             </div>
             <input class="button" type="submit" value="{{checktype}}" name="">
+            {{#if msg}}
+                <span class="error">{{msg}}</span>
+            {{/if}}
         </form>
     </div>
 </div>

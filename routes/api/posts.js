@@ -38,10 +38,19 @@ router.post('/:id', async (req, res) => {
 		place_id: req.params.id,
 		place_name: req.body.name
 	}
+	var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/; 
+	var icFormat = /^[STFG]\d{7}[A-Z]$/;
 	if (!visitor.ic || !visitor.number) {
-		return res.status(400).json({msg: 'Please include a name and email'})
+		res.status(500)
+		res.render('form', {msg: 'Please include a name and email !', checktype: 'Check In'})
+	} else if (icFormat.test(visitor.ic) || format.test(visitor.number) ) {
+		res.render('form', {msg: 'Please include key in only IC and Number !', checktype: 'Check In'})
 	} 
-	else {
+	else if (visitor.ic.length != 9)  {
+		//check if ic contains 2 alpha
+		res.render('form', {msg: 'Please key IC properly!', checktype: 'Check In'})
+	} 
+	else { //only case that pass 
 		try { 
 			await loadPostsCollection((dbCollection) => {
 				dbCollection.insertOne(visitor);
@@ -68,8 +77,17 @@ router.post('/checkout/:id', async (req, res) => {
 		status: 'Check-out',
 		place_id: req.body.name 
 	}
+	var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/; 
+	var icFormat = /^[STFG]\d{7}[A-Z]$/;
 	if (!visitor.ic || !visitor.number) {
-		return res.status(400).json({msg: 'Please include a name and email'})
+		res.status(500)
+		res.render('form', {msg: 'Please include a name and email !', checktype: 'Check Out'})
+	} else if (icFormat.test(visitor.ic) || format.test(visitor.number) ) {
+		res.render('form', {msg: 'Please include key in only IC and Number !', checktype: 'Check Out'})
+	} 
+	else if (visitor.ic.length != 9)  {
+		//check if ic contains 2 alpha
+		res.render('form', {msg: 'Please key IC properly!', checktype: 'Check Out'})
 	} 
 	else {
 		try { 
