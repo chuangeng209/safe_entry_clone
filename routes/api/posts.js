@@ -3,6 +3,11 @@ const mongodb = require('mongodb');
 const router = express.Router();
 const ObjectId = require('mongodb').ObjectId;
 
+const session = require('express-session');
+const { check, validationResult } = require('express-validator');
+
+
+
 require('dotenv').config()
 const dbConnection = process.env.DB_CONNECTION
 
@@ -28,43 +33,99 @@ router.get('/', async (req, res) => {
 	});
 
 
+//get post _id
+
+router.get('/:id', async (req, res) => {
+	try {
+		await loadPostsCollection((dbCollection) => {
+			//console.log(typeof req.params.id)
+			//console.log(req.params.id)
+			dbCollection.find({"_id": ObjectId(req.params.id)}).toArray((err,result) => {
+				res.send(result)
+			})
+		});
+	} catch (error) {
+		console.log(error);
+	}
+}
+)
+
 //Add Post - check in 
-router.post('/:id', async (req, res) => {
-	const visitor = { 
-		ic: req.body.ic,
-		number: req.body.number,
-		date: sgTime('+8'),
-		status: 'Check-in',
-		place_id: req.params.id,
-		place_name: req.body.name
-	}
-	var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/; 
-	var icFormat = /^[STFG]\d{7}[A-Z]$/;
-	if (!visitor.ic || !visitor.number) {
-		res.status(500)
-		res.render('form', {msg: 'Please include a name and email !', checktype: 'Check In'})
-	} else if (icFormat.test(visitor.ic) || format.test(visitor.number) ) {
-		res.render('form', {msg: 'Please include key in only IC and Number !', checktype: 'Check In'})
-	} 
-	else if (visitor.ic.length != 9)  {
-		//check if ic contains 2 alpha
-		res.render('form', {msg: 'Please key IC properly!', checktype: 'Check In'})
-	} 
-	else { //only case that pass 
-		try { 
-			await loadPostsCollection((dbCollection) => {
-				dbCollection.insertOne(visitor);
-				console.log('post test', visitor)
-				//console.log('test visitor id', visitor._id)
-				res.status(200);
-				res.redirect('/success/' + ObjectId(visitor._id).valueOf());
-			});
-			// res.status(201).send();
-		 } catch (error) {
-			 console.log(error);
-		 }
-	}
+router.post('/:id', 
+	[
+		check('ic').custom((ic, {req}) => {
+			console.log(ic)
+			let icFormat = /^[stfgSTFG]\d{7}[a-zA-Z]$/;
+			if (!icFormat.test(ic) || ic.length != 9) {
+				throw new Error('Please key in IC properly')
+			} else {
+				return true
+			}			
+		}),	
+		check('number').custom((val, {req, loc, path}) => {			
+			var num_format = /^[0-9]{8}$/;
+			if (!num_format.test(val) || val.length !== 8) {
+				throw new Error ('Number is required')
+			} else {
+				return true
+			}
+		}),
+			
+	],
+	 async (req, res) => {
+	
+		let errors = validationResult(req).array();
+
+		console.log(typeof(errors))
+
+		if (errors.length != 0) {
+
+			console.log(errors.length)
+
+			req.session.errors = errors;
+			req.session.success = false;
+
+			return res.redirect('/form/' + req.params.id);
+			
+		} else {
+
+			const visitor = { 
+				ic: req.body.ic,
+				number: req.body.number,
+				date: sgTime('+8'),
+				status: 'Check-in',
+				place_id: req.params.id,
+				place_name: req.body.name
+			}
+
+			console.log(visitor)
+
+			req.session.success = true; 
+		
+			//only case that pass 
+			try { 
+				await loadPostsCollection((dbCollection) => {
+					dbCollection.insertOne(visitor);
+					//console.log('post test', visitor)
+					//console.log('test visitor id', ObjectId(visitor._id).valueOf());
+					res.status(200);
+					console.log('test visitor id', ObjectId(visitor._id).valueOf());
+					return res.redirect('/success/' + ObjectId(visitor._id).valueOf());
+				});
+			} catch (error) {
+				console.error(error);
+			}
+
+
+
+		}
+
+
   });
+
+
+
+
 
 
 // KIV
@@ -104,19 +165,6 @@ router.post('/checkout/:id', async (req, res) => {
 	}
   });
 
-// get id of all check in and out user  
-router.get('/:id', async (req, res) => {
-	try {
-		await loadPostsCollection((dbCollection) => {
-			dbCollection.find({"_id": ObjectId(req.params.id)}).toArray((err,result) => {
-				res.send(result)
-			})
-		});
-	} catch (error) {
-		console.log(error);
-	}
-}
-)
 
 
 // when user use the check in already link 

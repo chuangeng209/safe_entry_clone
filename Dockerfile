@@ -1,6 +1,7 @@
 FROM node:12-alpine
 WORKDIR /app
-COPY . .
+COPY package*.json ./
 RUN npm install --production
-EXPOSE 8080
+COPY . .
+EXPOSE 3000
 CMD ["npm", "run" , "dev"]

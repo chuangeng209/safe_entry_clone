@@ -4,11 +4,14 @@
             Back
         </a>
     </nav>
-
-    <div class="resize">    
-        <img src="/images/fakeEntry.png" alt="" id="logo" class="image">
-    </div>
     <div class="display">
+        
+            {{# if errors }}
+              {{# each errors }}
+                <p class="alert alert-danger">{{ this.msg }}</p>
+              {{/each}}
+            {{/if}}
+
         
         <form action="{{api}}" method="POST" class="my-form">
             <strong>{{name}}</strong>
@@ -22,9 +25,10 @@
                 <input type="number" name="number" class="number">
             </div>
             <input class="button" type="submit" value="{{checktype}}" name="">
-            {{#if msg}}
+            {{!--{{#if msg}}
                 <span class="error">{{msg}}</span>
-            {{/if}}
+            {{/if}}--}}
+
         </form>
     </div>
 </div>

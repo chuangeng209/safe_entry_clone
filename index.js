@@ -10,6 +10,18 @@ const helmet = require('helmet')
 
 require('dotenv').config()
 
+//const cookieParser = require('cookie-parser');
+const session = require('express-session');
+
+
+
+//app.use(cookieParser());
+app.use(session({
+    secret: 'positronx',
+    saveUninitialized: false,
+    resave: false
+}));
+
 
 app.use(helmet())
 app.use(logger)
@@ -29,7 +41,7 @@ app.set('view engine', 'handlebars');
 //////////////////////////////Display web page/////////////////////////////////////////////
 //sequence impt 
 
-template =  process.env.HOST_LINK || 'http://localhost:' + process.env.PORT //||// || 'http://localhost:5000' only this will change 
+template = 'http://localhost:' + process.env.PORT //||// process.env.HOST_LINK || || 'http://localhost:5000' only this will change 
 
 let url = new URL(template + '/api/register');
 let form_api = new URL(template + '/api/posts'); 
@@ -95,9 +107,14 @@ app.get('/form/:id', (req,res) => {
                 name: data[0].name,
                 back: backId,
                 api: form_api + '/' + req.params.id, // 'http://127.0.0.1:5000/api/posts/sadsadsa
-                checktype: 'Check In'
+                checktype: 'Check In',
+                success: req.session.success,
+                errors: req.session.errors,
             })
-        }).catch((error) => console.log(error));
+            req.session.errors = null;
+            
+        }).catch((error) => 
+        console.log(error))
     }
 });
 
@@ -127,7 +144,8 @@ app.get('/success/:id', (req,res) => { // check in
     status_link = form_api + '/' + req.params.id
     api(status_link)
     function api(input) {
-        return fetch(input).then(res => res.json()).then(data => {
+        return fetch(input).then(
+            res => res.json()).then(data => {
             console.log('return' , data[0])
             if (data[0].status == 'Check-in') {
                 res.render('success', {
@@ -176,7 +194,8 @@ app.use('/api/posts', posts);
 app.use('/api/register', register);
 
 
-const PORT = process.env.PORT || 5000; //look for port in environment (deploy) || in dev in 5000 
+
+const PORT = process.env.PORT || 3000; //look for port in environment (deploy) || in dev in 5000 
 app.listen(PORT, () => console.log(`server started on ${PORT}`));
 
 
