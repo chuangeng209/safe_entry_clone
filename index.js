@@ -8,10 +8,12 @@ const QRCode = require('qrcode')
 const logger = require('./middleware/logger')
 const helmet = require('helmet')
 
+
 require('dotenv').config()
 
 //const cookieParser = require('cookie-parser');
 const session = require('express-session');
+
 
 
 
@@ -36,6 +38,8 @@ app.use(express.urlencoded({extended: false}))
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
+
+
 ///////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////Display web page/////////////////////////////////////////////
@@ -52,7 +56,15 @@ let home_url = new URL (template);
 
 
 //register biz for fake entry to visitors
-app.get('/registration', (req,res) => res.render('register'));
+app.get('/registration', (req,res) => 
+{
+    res.render('register', {
+        success: req.session.success,
+        errors: req.session.errors,
+        })        
+    req.session.errors = null;
+}
+);
 
 
 ////Link to qr code - register collection 
@@ -62,10 +74,11 @@ app.get('/link/:id', (req,res) => {
     api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
-            //console.log(data[0].name)
+            //console.log(data.name)
+
             QRCode.toDataURL(homeId, function (err, url) {
                 res.render('link', {
-                    name: data[0].name,
+                    name: data.name,
                     qrcodelink: homeId,
                     qrcode: url
                 })
@@ -79,13 +92,15 @@ app.get('/link/:id', (req,res) => {
 
 // landing page - entry of the location  , have check in or checkout options 
 app.get('/:id', (req,res) => {
-    let urlId = url+'/'+req.params.id;
+    let urlId = url+'/'+ req.params.id;
     let formId = form_url + '/' +req.params.id;
     let checkoutId = checkout_url + '/' +req.params.id
     api(urlId)
     function api(input) {
+
         return fetch(input).then(res => res.json()).then(data => {
-            console.log(data)
+            
+
             res.render('index', {
                 name: data[0].name,
                 qrcodelink: formId,
@@ -103,6 +118,7 @@ app.get('/form/:id', (req,res) => {
     api(urlId)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
+            //console.log(data[0])
             res.render('form', {
                 name: data[0].name,
                 back: backId,
@@ -146,7 +162,7 @@ app.get('/success/:id', (req,res) => { // check in
     function api(input) {
         return fetch(input).then(
             res => res.json()).then(data => {
-            console.log('return' , data[0])
+
             if (data[0].status == 'Check-in') {
                 res.render('success', {
                     name: data[0].place_name,
@@ -156,6 +172,9 @@ app.get('/success/:id', (req,res) => { // check in
                     checkOut: true
                 })
             } else {
+
+                console.log(data);
+
                 res.render('success', {
                     name: data[0].place_name,
                     date: data[0].date,
@@ -176,7 +195,7 @@ app.get('/complete/:id', (req,res) => { //check out
     api(form_api+ '/' + req.params.id)
     function api(input) {
         return fetch(input).then(res => res.json()).then(data => {
-            console.log(data[0])
+            //console.log(data)
             res.render('checkout', {
                 name: data[0].place_name,
                 date: data[0].date,

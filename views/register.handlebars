@@ -1,6 +1,15 @@
 <div class="container">
     <p></p>
     <div class="display">
+
+                
+        {{# if errors }}
+            {{# each errors }}
+            <p class="alert alert-danger" style="color: red">{{ this.msg }}</p>
+            {{/each}}
+        {{/if}}
+
+
         <h3>Register with business email</h3>
         <form action="/api/register" method="POST" class="my-form">
             <div class="form-group">

@@ -5,6 +5,10 @@ const router = express.Router();
 require('dotenv').config()
 const dbConnection = process.env.DB_CONNECTION
 
+const session = require('express-session');
+const { check, validationResult } = require('express-validator');
+
+
 
 
 function sgTime(offset){
@@ -28,9 +32,10 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
 	try {
+		
 		await loadPostsCollection((dbCollection) => {
 			//console.log(typeof req.params.id)
-			//console.log(req.params.id)
+
 			dbCollection.find({"_id": ObjectId(req.params.id)}).toArray((err,result) => {
 				res.send(result)
 			})
@@ -41,16 +46,30 @@ router.get('/:id', async (req, res) => {
 }
 )
 
-router.post('/', async (req, res) => {
-	const biz = {
-		name: req.body.name,
-		email: req.body.email,
-		date: sgTime('+8')
-	}
-	if (!biz.name || !biz.email) {
-		return res.status(400).json({msg: 'Please include a name and email'})
-	} 
-	else {
+router.post('/', 
+	[
+		check('name').not().isEmpty().withMessage('Name is required'),
+		check('email', 'Email is required').isEmail()
+	],
+async (req, res) => {
+	let errors = validationResult(req).array();
+
+	if (errors.length != 0) {
+
+
+		//console.log(errors.length);
+
+		req.session.errors = errors;
+		req.session.success = false;
+
+		return res.redirect('/registration');
+	} else {
+		const biz = {
+			name: req.body.name,
+			email: req.body.email,
+			date: sgTime('+8')
+		}
+
 		try { 
 			await loadPostsCollection((dbCollection) => {
 				dbCollection.insertOne(biz);
@@ -71,6 +90,7 @@ router.post('/', async (req, res) => {
 			 console.log(error);
 		 }
 	}
+
   });
 
 async function loadPostsCollection(successCallback) { 

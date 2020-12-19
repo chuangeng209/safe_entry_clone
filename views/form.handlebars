@@ -1,6 +1,7 @@
 <div class = "container">
-    <nav>
-        <a href="{{back}}">
+    <nav >
+        <span>&#8592;</span>
+        <a href="{{back}}" class="back">
             Back
         </a>
     </nav>
@@ -8,14 +9,15 @@
         
             {{# if errors }}
               {{# each errors }}
-                <p class="alert alert-danger">{{ this.msg }}</p>
+                <p class="alert alert-danger" style="color: red">{{ this.msg }}</p>
               {{/each}}
             {{/if}}
 
         
         <form action="{{api}}" method="POST" class="my-form">
             <strong>{{name}}</strong>
-            <input type="hidden" id="name" name="name" value={{name}}>
+            <input type="hidden" name="name" value="{{name}}">
+
             <div class="form-group">
                 <p><label for="ic">NRIC/FIN</label></p>
                 <input type="text" name="ic" class="ic">

@@ -8,6 +8,19 @@ body{
 }
 
 
+span {
+  content: "\2190";
+}
+
+.back {
+    font-size: 14px;
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;;
+    color: black;
+    font-size: large;
+    text-decoration: none;
+    
+  }
+
 .error{
     line-height: 40px!important;
     color: red;

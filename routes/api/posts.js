@@ -38,8 +38,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
 	try {
 		await loadPostsCollection((dbCollection) => {
-			//console.log(typeof req.params.id)
-			//console.log(req.params.id)
+
 			dbCollection.find({"_id": ObjectId(req.params.id)}).toArray((err,result) => {
 				res.send(result)
 			})
@@ -50,11 +49,11 @@ router.get('/:id', async (req, res) => {
 }
 )
 
-//Add Post - check in 
+//Add Post - check in --> done 
 router.post('/:id', 
 	[
 		check('ic').custom((ic, {req}) => {
-			console.log(ic)
+
 			let icFormat = /^[stfgSTFG]\d{7}[a-zA-Z]$/;
 			if (!icFormat.test(ic) || ic.length != 9) {
 				throw new Error('Please key in IC properly')
@@ -70,24 +69,28 @@ router.post('/:id',
 				return true
 			}
 		}),
-			
 	],
 	 async (req, res) => {
 	
 		let errors = validationResult(req).array();
 
-		console.log(typeof(errors))
+		//console.log(typeof(errors))
 
 		if (errors.length != 0) {
 
-			console.log(errors.length)
+			//console.log(errors.length)
 
 			req.session.errors = errors;
 			req.session.success = false;
 
+
+			//console.log(req.body.name);
+
 			return res.redirect('/form/' + req.params.id);
 			
 		} else {
+
+			//console.log(req.params)
 
 			const visitor = { 
 				ic: req.body.ic,
@@ -98,7 +101,7 @@ router.post('/:id',
 				place_name: req.body.name
 			}
 
-			console.log(visitor)
+			//console.log(visitor)
 
 			req.session.success = true; 
 		
@@ -109,7 +112,8 @@ router.post('/:id',
 					//console.log('post test', visitor)
 					//console.log('test visitor id', ObjectId(visitor._id).valueOf());
 					res.status(200);
-					console.log('test visitor id', ObjectId(visitor._id).valueOf());
+					//console.log('test visitor id', ObjectId(visitor._id).valueOf());
+
 					return res.redirect('/success/' + ObjectId(visitor._id).valueOf());
 				});
 			} catch (error) {
@@ -130,31 +134,58 @@ router.post('/:id',
 
 // KIV
 //Add Post for checkout - manually key in 
-router.post('/checkout/:id', async (req, res) => {
+router.post('/checkout/:id', 
+[
+	check('ic').custom((ic, {req}) => {
+		//console.log(ic)
+		let icFormat = /^[stfgSTFG]\d{7}[a-zA-Z]$/;
+		if (!icFormat.test(ic) || ic.length != 9) {
+			throw new Error('Please key in IC properly')
+		} else {
+			return true
+		}			
+	}),	
+	check('number').custom((val, {req, loc, path}) => {			
+		var num_format = /^[0-9]{8}$/;
+		if (!num_format.test(val) || val.length !== 8) {
+			throw new Error ('Number is required')
+		} else {
+			return true
+		}
+	}),
+],
+async (req, res) => {
+
+	let errors = validationResult(req).array();
+
+
+	if (errors.length != 0) {
+
+
+		req.session.errors = errors;
+		req.session.success = false;
+
+		return res.redirect('/form/' + req.params.id);
+		
+	} else {
+
 	const visitor = { 
 		ic: req.body.ic,
 		number: req.body.number,
 		date: sgTime('+8'),
 		status: 'Check-out',
-		place_id: req.body.name 
+		place_name: req.body.name 
 	}
-	var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/; 
-	var icFormat = /^[STFG]\d{7}[A-Z]$/;
-	if (!visitor.ic || !visitor.number) {
-		res.status(500)
-		res.render('form', {msg: 'Please include a name and email !', checktype: 'Check Out'})
-	} else if (icFormat.test(visitor.ic) || format.test(visitor.number) ) {
-		res.render('form', {msg: 'Please include key in only IC and Number !', checktype: 'Check Out'})
-	} 
-	else if (visitor.ic.length != 9)  {
-		//check if ic contains 2 alpha
-		res.render('form', {msg: 'Please key IC properly!', checktype: 'Check Out'})
-	} 
-	else {
+
+
+	req.session.success = true; 
+
+
+
 		try { 
 			await loadPostsCollection((dbCollection) => {
 				dbCollection.insertOne(visitor);
-				console.log(visitor)
+				//console.log(visitor)
 				res.status(200);
 				res.redirect('/success/' + ObjectId(visitor._id).valueOf());
 			});
@@ -162,7 +193,8 @@ router.post('/checkout/:id', async (req, res) => {
 		 } catch (error) {
 			 console.log(error);
 		 }
-	}
+
+		}
   });
 
 
@@ -172,7 +204,7 @@ router.post('/out/:id', async (req, res) => { //check out using the link
 	try {
 		await loadPostsCollection((dbCollection) => {
 			dbCollection.find({"_id": ObjectId(req.params.id)}).toArray((err,result) => {
-				console.log(result[0])
+				//console.log(result[0])
 				const outgoing = {
 					ic: result[0].ic,
 					number: result[0].number,
@@ -200,32 +232,6 @@ router.post('/out/:id', async (req, res) => { //check out using the link
 		console.log(error);
 	}
 
-	//console.log(api(req.params.id));
-	// need to include , if the user check out beforehand in the unique id, will bring them back to form homepage
-
-	//const visitor = { 
-	//    ic: req.body.ic,
-	//    number: req.body.number,
-	//    date: sgTime('+8'),
-	//    status: 'Check-out',
-	//    place_id: req.params.id 
-	//}
-	//if (!visitor.ic || !visitor.number) {
-	//    return res.status(400).json({msg: 'Please include a name and email'})
-	//} 
-	//else {
-		//try { 
-		//    await loadPostsCollection((dbCollection) => {
-		//        dbCollection.insertOne(visitor);
-		//        res.status(200);
-		//        res.redirect('http://127.0.0.1:5000/success/' + ObjectId(visitor._id));
-		//    }
-		//    );
-		//    // res.status(201).send();
-		// } catch (error) {
-		//     console.log(error);
-		// }
-	//}
 }
 );
 
