@@ -14,9 +14,6 @@ require('dotenv').config()
 //const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
-
-
-
 //app.use(cookieParser());
 app.use(session({
     secret: 'positronx',
@@ -45,7 +42,7 @@ app.set('view engine', 'handlebars');
 //////////////////////////////Display web page/////////////////////////////////////////////
 //sequence impt 
 
-template = 'http://localhost:' + process.env.PORT //||// process.env.HOST_LINK || || 'http://localhost:5000' only this will change 
+template = process.env.HOST_LINK || 'http://localhost:' + process.env.PORT // process.env.HOST_LINK || || 'http://localhost:5000' only this will change 
 
 let url = new URL(template + '/api/register');
 let form_api = new URL(template + '/api/posts'); 
